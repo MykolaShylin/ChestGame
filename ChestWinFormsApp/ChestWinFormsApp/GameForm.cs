@@ -14,7 +14,7 @@ namespace ChestWinFormsApp
         {
             InitializeComponent();
             NewGame();
-            ClientSize = new Size(900, 680);
+            ClientSize = new Size(825, 680);
         }
 
         public void NewGame()
@@ -58,6 +58,7 @@ namespace ChestWinFormsApp
                 if (isFigureInMoving && buttonPressed.BackgroundImage != null)
                 {
                     MakeAMove(buttonPressed);
+                    CheckForEndGame();
                     ClearStepsForMoving();
                     prevButton = buttonPressed;
                 }
@@ -67,14 +68,16 @@ namespace ChestWinFormsApp
         {
             buttonPressed.Image = prevButton.Image;
             prevButton.Image = null;
-            var tempMapVal = gameMap[buttonPressed.Location.Y / 85, buttonPressed.Location.X / 85];
+            buttonPressed.ForeColor = Color.Black;
+            prevButton.ForeColor = Color.Black;
+            var tempMapVal = 0;
             gameMap[buttonPressed.Location.Y / 85, buttonPressed.Location.X / 85] = gameMap[prevButton.Location.Y / 85, prevButton.Location.X / 85];
             gameMap[prevButton.Location.Y / 85, prevButton.Location.X / 85] = tempMapVal;
-            isFigureInMoving = false;
+            isFigureInMoving = false;            
             SwitchPlayer();
         }
         public void CheckForEndGame()
-        {
+        {            
             for (int i = 0; i < 8; i++)
             {
                 for (int j = 0; j < 8; j++)
@@ -89,15 +92,15 @@ namespace ChestWinFormsApp
                                 {
                                     return;
                                 }
-                            }
-                            EndGame(2);
-                            return;
+                            }                            
                         }
-                    }
-                    EndGame(1);
-                    return;
+                        EndGame(2);
+                        return;
+                    }                    
                 }
             }
+            EndGame(1);
+            return;
         }
 
         private void EndGame(int currPlayer)
@@ -144,9 +147,8 @@ namespace ChestWinFormsApp
                             buttons[rowCurrFigure - 1 * direction, columnCurrFigure].BackgroundImage = Properties.Resources.Green;
                             buttons[rowCurrFigure - 1 * direction, columnCurrFigure].BackgroundImageLayout = ImageLayout.Stretch;
                         }
-                        if (gameMap[rowCurrFigure - 2 * direction, columnCurrFigure] == 0 && buttons[rowCurrFigure, columnCurrFigure].ForeColor == Color.Green)
-                        {
-                            buttons[rowCurrFigure, columnCurrFigure].ForeColor = Color.Black;
+                        if (IsOnMap(rowCurrFigure - 2 * direction, columnCurrFigure) && gameMap[rowCurrFigure - 2 * direction, columnCurrFigure] == 0 && buttons[rowCurrFigure, columnCurrFigure].ForeColor == Color.Green)
+                        {                            
                             buttons[rowCurrFigure - 2 * direction, columnCurrFigure].BackgroundImage = Properties.Resources.Green;
                             buttons[rowCurrFigure - 2 * direction, columnCurrFigure].BackgroundImageLayout = ImageLayout.Stretch;
                         }
@@ -522,6 +524,11 @@ namespace ChestWinFormsApp
         {
             ClearMap();
             NewGame();
+        }
+
+        private void exitButton_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
         }
     }
 }
