@@ -10,6 +10,7 @@ namespace ChestWinFormsApp
         public bool isFigureInMoving;
         public int currentPlayer;
         public Color mapColor;
+        public int newFigureVal;
         public GameForm()
         {
             InitializeComponent();
@@ -58,49 +59,58 @@ namespace ChestWinFormsApp
                 if (isFigureInMoving && buttonPressed.BackgroundImage != null)
                 {
                     MakeAMove(buttonPressed);
-                    CheckForEndGame();
+                    Task.Delay(500);
                     ClearStepsForMoving();
+                    CheckForPawnChenging(rowCurrFigure, columnCurrFigure, gameMap[rowCurrFigure, columnCurrFigure] % 10);                    
+                    SwitchPlayer();
                     prevButton = buttonPressed;
                 }
             }
         }
+
+        private void CheckForPawnChenging(int rowCurrFigure, int columnCurrFigure, int currFigure)
+        {
+            if (currentPlayer == 1)
+            {
+                if(currFigure == 6 && rowCurrFigure == 0)
+                {
+                    var newFigure = new WhitePawnChengingFiguresForm(this, rowCurrFigure, columnCurrFigure);
+                    newFigure.Show();
+                    this.Enabled = false;
+                }
+            }
+            else
+            {
+                if (currFigure == 6 && rowCurrFigure == 7)
+                {
+                    var newFigure = new BlackPawnChengingFiguresForm(this, rowCurrFigure, columnCurrFigure);
+                    newFigure.Show();
+                    this.Enabled = false;
+                }
+            }
+        }
+
         public void MakeAMove(Button buttonPressed)
         {
             buttonPressed.Image = prevButton.Image;
             prevButton.Image = null;
             buttonPressed.ForeColor = Color.Black;
             prevButton.ForeColor = Color.Black;
-            var tempMapVal = 0;
-            gameMap[buttonPressed.Location.Y / 85, buttonPressed.Location.X / 85] = gameMap[prevButton.Location.Y / 85, prevButton.Location.X / 85];
-            gameMap[prevButton.Location.Y / 85, prevButton.Location.X / 85] = tempMapVal;
-            isFigureInMoving = false;            
-            SwitchPlayer();
-        }
-        public void CheckForEndGame()
-        {            
-            for (int i = 0; i < 8; i++)
+            if(currentPlayer == 1 && gameMap[buttonPressed.Location.Y / 85, buttonPressed.Location.X / 85] % 10 == 5)
             {
-                for (int j = 0; j < 8; j++)
-                {
-                    if (gameMap[i, j] / 10 == 1)
-                    {
-                        for (int q = 0; q < 8; q++)
-                        {
-                            for (int a = 0; a < 8; a++)
-                            {
-                                if (gameMap[q, a] / 10 == 2)
-                                {
-                                    return;
-                                }
-                            }                            
-                        }
-                        EndGame(2);
-                        return;
-                    }                    
-                }
+                EndGame(1);
             }
-            EndGame(1);
-            return;
+            else if(currentPlayer == 2 && gameMap[buttonPressed.Location.Y / 85, buttonPressed.Location.X / 85] % 10 == 5)
+            {
+                EndGame(2);
+            }
+            else
+            {
+                var tempMapVal = 0;
+                gameMap[buttonPressed.Location.Y / 85, buttonPressed.Location.X / 85] = gameMap[prevButton.Location.Y / 85, prevButton.Location.X / 85];
+                gameMap[prevButton.Location.Y / 85, prevButton.Location.X / 85] = tempMapVal;
+                isFigureInMoving = false;
+            }                        
         }
 
         private void EndGame(int currPlayer)
@@ -148,7 +158,7 @@ namespace ChestWinFormsApp
                             buttons[rowCurrFigure - 1 * direction, columnCurrFigure].BackgroundImageLayout = ImageLayout.Stretch;
                         }
                         if (IsOnMap(rowCurrFigure - 2 * direction, columnCurrFigure) && gameMap[rowCurrFigure - 2 * direction, columnCurrFigure] == 0 && buttons[rowCurrFigure, columnCurrFigure].ForeColor == Color.Green)
-                        {                            
+                        {
                             buttons[rowCurrFigure - 2 * direction, columnCurrFigure].BackgroundImage = Properties.Resources.Green;
                             buttons[rowCurrFigure - 2 * direction, columnCurrFigure].BackgroundImageLayout = ImageLayout.Stretch;
                         }

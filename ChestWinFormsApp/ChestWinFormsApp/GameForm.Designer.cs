@@ -68,7 +68,8 @@
             this.Controls.Add(this.exitButton);
             this.Controls.Add(this.restartButton);
             this.Name = "GameForm";
-            this.Text = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Chest";
             this.ResumeLayout(false);
             this.PerformLayout();
 
